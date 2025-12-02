@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Отсчёт до дня рождения</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0f1724;
+      --card:#0b1220;
+      --accent:#7c5cff;
+      --muted:#9aa6bd;
+      --glass: rgba(255,255,255,0.04);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;
+      background: var(--bg);
+      color:#e6eef8; display:flex; align-items:center; justify-content:center; padding:32px;
+    }
+
+    .wrap{width:100%;max-width:900px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:18px;padding:36px;box-shadow:0 6px 30px rgba(2,6,23,0.6);position:relative;overflow:hidden}
+
+    .card{display:flex;gap:40px;align-items:center;justify-content:space-between;padding:26px;border-radius:12px;background:var(--glass);backdrop-filter: blur(6px);}
+    .left{flex:1}
+    .countdown{display:flex;gap:12px;align-items:center;justify-content:flex-start;}
+    .timebox{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:18px 24px;min-width:96px;text-align:center;flex:1;}
+    .num{font-weight:800;font-size:28px}
+    .label{font-size:12px;color:var(--muted);margin-top:6px;}
+
+    .controls{display:flex;flex-direction:column;gap:12px;align-items:stretch;min-width:280px;}
+    .input-group{display:flex;flex-direction:column;gap:6px;}
+    .input-group label{font-size:13px;color:var(--muted);}
+    input[type=datetime-local]{background:transparent;border:1px solid rgba(255,255,255,0.1);padding:12px 14px;border-radius:10px;color:inherit;font-size:14px;width:100%;}
+    .button-group{display:flex;gap:10px;}
+    .btn{background:linear-gradient(90deg,var(--accent),#2dd4bf);border:none;padding:14px 20px;border-radius:12px;color:#021020;font-weight:700;cursor:pointer;white-space:nowrap;flex:1;font-size:15px;transition:all 0.2s ease;}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(124, 92, 255, 0.3);}
+    .btn:active{transform:translateY(0);}
+    .btn.reset{background:linear-gradient(90deg, #9aa6bd, #7c8ba8);}
+
+    .celebrate{position:absolute;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center;flex-direction:column}
+    .message{font-size:40px;font-weight:800;text-shadow:0 6px 30px rgba(0,0,0,0.6);display:none}
+
+    .popper{position:absolute;opacity:0;transform:translateY(20px) scale(0.8);transition:transform .7s,opacity .3s;font-size:100px}
+    .popper.show{opacity:1;transform:translateY(-40px) scale(1)}
+
+    footer{margin-top:20px;color:var(--muted);font-size:12px;text-align:center}
+
+    canvas{position:absolute;inset:0;pointer-events:none}
+
+    /* Overlay */
+    .overlay{
+      position: fixed; top:0; left:0; width:100%; height:100%;
+      background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+      display:flex; align-items:center; justify-content:center;
+      opacity:0; visibility:hidden; transition:opacity 0.5s ease, visibility 0.5s;
+      z-index:9999; font-size:48px; font-weight:800; color:#fff; text-align:center;
+    }
+    .overlay.show{opacity:1; visibility:visible;}
+    .overlay-content{animation:pulse 2s infinite; padding:40px;}
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .card{flex-direction:column;gap:24px;}
+      .controls{min-width:100%;}
+      .timebox{padding:14px 18px;min-width:70px;}
+      .num{font-size:24px;}
+      .wrap{padding:24px;}
+    }
+
+    @media (max-width: 480px) {
+      .countdown{flex-wrap:wrap;justify-content:center;}
+      .timebox{flex:0 0 calc(50% - 6px);margin-bottom:6px;}
+      .button-group{flex-direction:column;}
+      .overlay-content{font-size:32px;padding:20px;}
+    }
+  </style>
+</head>
+<body>
+  <div id="overlay" class="overlay">
+    <div class="overlay-content">Поздравляем с Днём Рождения! 🎉</div>
+  </div>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="left">
+        <div class="countdown">
+          <div class="timebox"><div class="num" id="days">0</div><div class="label">Дни</div></div>
+          <div class="timebox"><div class="num" id="hours">00</div><div class="label">Часы</div></div>
+          <div class="timebox"><div class="num" id="minutes">00</div><div class="label">Минуты</div></div>
+          <div class="timebox"><div class="num" id="seconds">00</div><div class="label">Секунды</div></div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="input-group">
+          <label for="targetInput">Выберите дату дня рождения:</label>
+          <input id="targetInput" type="datetime-local">
+        </div>
+        <div class="button-group">
+          <button id="startBtn" class="btn">Запустить отсчёт</button>
+          <button id="resetBtn" class="btn reset">Сброс</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="celebrate" id="celebrate">
+      <div id="message" class="message">Поздравляем с Днём Рождения! 🎉</div>
+      <div id="popper" class="popper">🎉</div>
+    </div>
+
+    <canvas id="confettiCanvas"></canvas>
+    <footer>Установите дату дня рождения и нажмите "Запустить отсчёт"</footer>
+  </div>
+
+<script>
+const $ = s => document.querySelector(s);
+const $days = $('#days'), $hours = $('#hours'), $minutes = $('#minutes'), $seconds = $('#seconds');
+const $start = $('#startBtn'), $reset = $('#resetBtn'), $input = $('#targetInput');
+const $message = $('#message'), $popper = $('#popper'), $celebrate = $('#celebrate');
+const $overlay = $('#overlay');
+
+let timerId = null;
+let celebrating = false;
+let currentTarget = null;
+
+// Функция для получения даты по умолчанию (через 7 дней в 12:00)
+function defaultTarget(){
+  const now = new Date();
+  const futureDate = new Date(now);
+  futureDate.setDate(futureDate.getDate() + 7); // Через 7 дней
+  futureDate.setHours(12, 0, 0, 0); // Установить на полдень
+  return futureDate;
+}
+
+function prefill(date){
+  const p = n=>String(n).padStart(2,'0');
+  $input.value = `${date.getFullYear()}-${p(date.getMonth()+1)}-${p(date.getDate())}T${p(date.getHours())}:${p(date.getMinutes())}`;
+}
+
+function updateCountdown(t){
+  const now = new Date();
+  let diff = t - now;
+  
+  // Если дата уже прошла, празднуем
+  if(diff <= 0 && !celebrating) {
+    triggerCelebration();
+    return;
+  }
+  
+  // Обновляем таймер
+  $days.textContent = Math.floor(diff/86400000);
+  $hours.textContent = String(Math.floor(diff/3600000)%24).padStart(2,'0');
+  $minutes.textContent = String(Math.floor(diff/60000)%60).padStart(2,'0');
+  $seconds.textContent = String(Math.floor(diff/1000)%60).padStart(2,'0');
+}
+
+function startTimer(t){
+  stopTimer();
+  currentTarget = t;
+  updateCountdown(t);
+  timerId = setInterval(()=>updateCountdown(t), 250);
+}
+
+function stopTimer(){ 
+  if(timerId){
+    clearInterval(timerId);
+    timerId=null;
+  } 
+}
+
+/* Confetti */
+const canvas = $('#confettiCanvas');
+const ctx = canvas.getContext('2d');
+let particles=[];
+
+function resize(){ 
+  canvas.width=innerWidth; 
+  canvas.height=innerHeight; 
+}
+window.addEventListener('resize',resize); 
+resize();
+
+function rand(a,b){ return Math.random()*(b-a)+a; }
+
+function spawnConfettiBurst(x,dir){
+  const colors=['#ff6b6b','#ffd166','#7c5cff','#2dd4bf','#9be15d','#ffb3e6'];
+  for(let i=0;i<60;i++){
+    particles.push({
+      x, y:canvas.height,
+      vx: rand(-6,6)*dir,
+      vy: rand(-18,-6),
+      size: rand(8,16),
+      rot: rand(0,6.28),
+      shape: ['circle','triangle','ribbon'][Math.floor(rand(0,3))],
+      color: colors[Math.floor(rand(0,colors.length))],
+      life: rand(70,160)
+    });
+  }
+}
+
+function spawnRain(count=150){
+  const colors=['#7c5cff','#2dd4bf','#ffd166','#ff6b6b','#9be15d'];
+  for(let i=0;i<count;i++){
+    particles.push({
+      x: rand(0,canvas.width),
+      y: rand(-canvas.height,0),
+      vx: rand(-1,1),
+      vy: rand(3,8),
+      size: rand(6,14),
+      rot: rand(0,6.28),
+      shape: ['circle','triangle','ribbon'][Math.floor(rand(0,3))],
+      color: colors[Math.floor(rand(0,colors.length))],
+      life: rand(60,200)
+    });
+  }
+}
+
+function drawParticle(p){
+  ctx.save();
+  ctx.translate(p.x,p.y);
+  ctx.rotate(p.rot);
+  ctx.globalAlpha=Math.max(p.life/200,0);
+  if(p.shape==='circle'){ 
+    ctx.beginPath(); 
+    ctx.fillStyle=p.color; 
+    ctx.arc(0,0,p.size/2,0,6.28); 
+    ctx.fill(); 
+  }
+  else if(p.shape==='triangle'){ 
+    ctx.fillStyle=p.color; 
+    ctx.beginPath(); 
+    ctx.moveTo(-p.size/2,p.size/2); 
+    ctx.lineTo(p.size/2,p.size/2); 
+    ctx.lineTo(0,-p.size/2); 
+    ctx.fill(); 
+  }
+  else if(p.shape==='ribbon'){ 
+    ctx.fillStyle=p.color; 
+    ctx.fillRect(-p.size/2,-p.size/6,p.size,p.size/3); 
+  }
+  ctx.restore();
+}
+
+function loop(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(let i=particles.length-1;i>=0;i--){
+    const p=particles[i];
+    p.x+=p.vx; 
+    p.y+=p.vy; 
+    p.vy+=0.12; 
+    p.rot+=0.04; 
+    p.life--;
+    drawParticle(p);
+    if(p.life<=0||p.y>canvas.height+40) particles.splice(i,1);
+  }
+  requestAnimationFrame(loop);
+}
+loop();
+
+/* Pop sound */
+const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+function popSound(){
+  if(audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  
+  try{
+    const o=audioCtx.createOscillator();
+    const g=audioCtx.createGain();
+    o.type='triangle';
+    o.frequency.value=900;
+    g.gain.value=0.3;
+    o.connect(g); 
+    g.connect(audioCtx.destination);
+    o.start(); 
+    o.stop(audioCtx.currentTime+0.25);
+  }catch(e){
+    console.log("Audio error:", e);
+  }
+}
+
+/* Celebration */
+function triggerCelebration(){
+  if(celebrating) return; // Уже празднуем
+  
+  celebrating = true;
+  stopTimer();
+  
+  // Показать сообщение
+  $message.style.display='block';
+  
+  // Показать оверлей
+  $overlay.classList.add("show");
+  
+  // Запустить конфетти
+  spawnRain(220);
+  spawnConfettiBurst(canvas.width*0.25,-1);
+  spawnConfettiBurst(canvas.width*0.75,1);
+  
+  // Звук
+  popSound();
+  
+  // Автоматически скрыть оверлей через 8 секунд
+  setTimeout(() => {
+    $overlay.classList.remove("show");
+    $message.style.display = 'none';
+    celebrating = false;
+    
+    // Сбросить на следующую дату
+    if(currentTarget) {
+      const nextYear = new Date(currentTarget);
+      nextYear.setFullYear(nextYear.getFullYear() + 1);
+      prefill(nextYear);
+      startTimer(nextYear);
+    } else {
+      const d = defaultTarget();
+      prefill(d);
+      startTimer(d);
+    }
+  }, 8000);
+}
+
+/* Инициализация */
+function init() {
+  // Установить дату по умолчанию (через 7 дней)
+  const initialDate = defaultTarget();
+  prefill(initialDate);
+  
+  // Начать отсчет
+  startTimer(initialDate);
+  
+  // Убедиться, что оверлей скрыт при запуске
+  $overlay.classList.remove("show");
+  $message.style.display = 'none';
+}
+
+/* Обработчики событий */
+$start.onclick = ()=>{
+  let t = new Date($input.value);
+  if(isNaN(t)) {
+    alert('Неверная дата');
+    return;
+  }
+  
+  // Проверить, не прошла ли дата
+  const now = new Date();
+  if(t <= now) {
+    alert('Пожалуйста, выберите дату в будущем');
+    return;
+  }
+  
+  celebrating = false;
+  $message.style.display = 'none';
+  $overlay.classList.remove("show");
+  startTimer(t);
+};
+
+$reset.onclick = ()=>{
+  celebrating = false;
+  $message.style.display = 'none';
+  $overlay.classList.remove("show");
+  const d = defaultTarget();
+  prefill(d);
+  startTimer(d);
+};
+
+// Запустить инициализацию
+init();
+</script>
+</body>
+</html>
