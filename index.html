@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Отсчёт до дня рождения</title>
+  <title>🎂 Отсчёт до дня рождения</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -18,6 +18,7 @@
       --success:#9be15d;
       --warning:#ffd166;
       --error:#ff6b6b;
+      --overlay-bg: rgba(10, 15, 26, 0.95);
     }
     *{box-sizing:border-box; margin:0; padding:0;}
     html,body{height:100%; overflow-x:hidden;}
@@ -466,17 +467,14 @@
       z-index: 15;
     }
 
-    /* Оверлей */
+    /* ОВЕРЛЕЙ С ПОЗДРАВЛЕНИЕМ - ТЕМНЫЙ ВАРИАНТ */
     .overlay{
       position: fixed;
       top:0;
       left:0;
       width:100%;
       height:100%;
-      background: linear-gradient(135deg, 
-        rgba(124, 92, 255, 0.9),
-        rgba(45, 212, 191, 0.9));
-      backdrop-filter: blur(20px);
+      background: var(--overlay-bg);
       display:flex;
       align-items:center;
       justify-content:center;
@@ -484,10 +482,21 @@
       visibility:hidden;
       transition:opacity 0.5s ease, visibility 0.5s;
       z-index:9999;
-      font-size:60px;
-      font-weight:800;
-      color:#fff;
-      text-align:center;
+      overflow: hidden;
+    }
+    
+    .overlay::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(124, 92, 255, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(45, 212, 191, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(155, 225, 93, 0.08) 0%, transparent 50%);
+      pointer-events: none;
     }
     
     .overlay.show{
@@ -496,14 +505,90 @@
     }
     
     .overlay-content{
-      animation:pulse 2s infinite, rainbow 3s linear infinite;
-      padding:60px;
-      background: rgba(255, 255, 255, 0.1);
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      max-width: 800px;
+      padding: 60px;
+      background: rgba(15, 23, 36, 0.7);
+      backdrop-filter: blur(30px);
       border-radius: 30px;
-      backdrop-filter: blur(20px);
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
-      max-width: 90%;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 
+        0 40px 80px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+    
+    .overlay-content::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.2), 
+        transparent);
+    }
+    
+    .birthday-title {
+      font-size: 64px;
+      font-weight: 800;
+      margin-bottom: 30px;
+      background: linear-gradient(135deg, #ff6b6b, #ffd166, #7c5cff, #2dd4bf, #9be15d);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: rainbow 3s linear infinite;
+      background-size: 400% 100%;
+      letter-spacing: -1px;
+      line-height: 1.2;
+    }
+    
+    .birthday-subtitle {
+      font-size: 24px;
+      color: var(--muted);
+      margin-bottom: 40px;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+    
+    .celebration-icons {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-top: 40px;
+      font-size: 48px;
+      animation: float-icons 3s ease-in-out infinite;
+    }
+    
+    .celebration-icons span {
+      animation-delay: calc(var(--i) * 0.2s);
+    }
+    
+    @keyframes float-icons {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+    
+    .close-overlay {
+      margin-top: 40px;
+      padding: 16px 32px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+    
+    .close-overlay:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(124, 92, 255, 0.4);
     }
 
     /* Адаптивность */
@@ -535,8 +620,16 @@
       }
       
       .overlay-content {
-        font-size: 40px;
         padding: 40px;
+        margin: 20px;
+      }
+      
+      .birthday-title {
+        font-size: 48px;
+      }
+      
+      .birthday-subtitle {
+        font-size: 20px;
       }
     }
 
@@ -568,8 +661,20 @@
       }
       
       .overlay-content {
-        font-size: 32px;
-        padding: 30px;
+        padding: 30px 20px;
+      }
+      
+      .birthday-title {
+        font-size: 36px;
+      }
+      
+      .birthday-subtitle {
+        font-size: 18px;
+      }
+      
+      .celebration-icons {
+        font-size: 36px;
+        gap: 20px;
       }
     }
 
@@ -599,6 +704,14 @@
       .label {
         font-size: 11px;
       }
+      
+      .birthday-title {
+        font-size: 32px;
+      }
+      
+      .birthday-subtitle {
+        font-size: 16px;
+      }
     }
   </style>
 </head>
@@ -613,9 +726,22 @@
     <div class="floating-element"></div>
   </div>
 
-  <!-- Оверлей с поздравлением -->
+  <!-- ОВЕРЛЕЙ С ПОЗДРАВЛЕНИЕМ - ТЕМНЫЙ ВАРИАНТ -->
   <div id="overlay" class="overlay">
-    <div class="overlay-content">🎉 Поздравляем с Днём Рождения! 🎂</div>
+    <div class="overlay-content">
+      <h1 class="birthday-title">🎉 С Днём Рождения! 🎂</h1>
+      <p class="birthday-subtitle">Поздравляем с самым прекрасным днём в году!<br>Пусть этот год принесёт много радости, успехов и счастливых моментов!</p>
+      
+      <div class="celebration-icons">
+        <span style="--i:0">🎂</span>
+        <span style="--i:1">🎁</span>
+        <span style="--i:2">🎈</span>
+        <span style="--i:3">✨</span>
+        <span style="--i:4">🥳</span>
+      </div>
+      
+      <button class="close-overlay" id="closeOverlay">Продолжить</button>
+    </div>
   </div>
 
   <!-- Основной контейнер -->
@@ -625,7 +751,7 @@
     
     <!-- Заголовок -->
     <div class="header">
-      <h1>Отсчёт до дня рождения</h1>
+      <h1>🎂 Отсчёт до дня рождения</h1>
       <p>Установите дату и следите за обратным отсчётом до самого важного дня в году!</p>
     </div>
 
@@ -648,9 +774,11 @@
         </div>
         <div class="button-group">
           <button id="startBtn" class="btn">
+            <span class="btn-icon">▶️</span>
             <span>Запустить отсчёт</span>
           </button>
           <button id="resetBtn" class="btn reset">
+            <span class="btn-icon">🔄</span>
             <span>Сброс</span>
           </button>
         </div>
@@ -678,7 +806,7 @@ const $ = s => document.querySelector(s);
 const $days = $('#days'), $hours = $('#hours'), $minutes = $('#minutes'), $seconds = $('#seconds');
 const $start = $('#startBtn'), $reset = $('#resetBtn'), $input = $('#targetInput');
 const $message = $('#message'), $popper = $('#popper'), $celebrate = $('#celebrate');
-const $overlay = $('#overlay'), $sparkles = $('#sparkles');
+const $overlay = $('#overlay'), $sparkles = $('#sparkles'), $closeOverlay = $('#closeOverlay');
 
 let timerId = null;
 let celebrating = false;
@@ -964,25 +1092,25 @@ function triggerCelebration(){
   
   // Звук
   playCelebrationSound();
+}
+
+// Функция закрытия оверлея
+function closeCelebration() {
+  $overlay.classList.remove("show");
+  $message.style.display = 'none';
+  celebrating = false;
   
-  // Автоматически скрыть оверлей через 10 секунд
-  setTimeout(() => {
-    $overlay.classList.remove("show");
-    $message.style.display = 'none';
-    celebrating = false;
-    
-    // Сбросить на следующую дату
-    if(currentTarget) {
-      const nextYear = new Date(currentTarget);
-      nextYear.setFullYear(nextYear.getFullYear() + 1);
-      prefill(nextYear);
-      startTimer(nextYear);
-    } else {
-      const d = defaultTarget();
-      prefill(d);
-      startTimer(d);
-    }
-  }, 10000);
+  // Сбросить на следующую дату
+  if(currentTarget) {
+    const nextYear = new Date(currentTarget);
+    nextYear.setFullYear(nextYear.getFullYear() + 1);
+    prefill(nextYear);
+    startTimer(nextYear);
+  } else {
+    const d = defaultTarget();
+    prefill(d);
+    startTimer(d);
+  }
 }
 
 // ==================== ИНИЦИАЛИЗАЦИЯ ====================
@@ -1032,6 +1160,14 @@ $reset.onclick = ()=>{
   prefill(d);
   startTimer(d);
 };
+
+// Обработчик закрытия оверлея
+$closeOverlay.onclick = closeCelebration;
+
+// Автоматическое закрытие оверлея через 15 секунд (на всякий случай)
+$overlay.addEventListener('show', () => {
+  setTimeout(closeCelebration, 15000);
+});
 
 // Обработка изменения размера окна
 window.addEventListener('resize', () => {
