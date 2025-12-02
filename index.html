@@ -39,6 +39,14 @@
       align-items:center; 
       justify-content:center; 
       padding:20px;
+      transition: background 0.5s ease;
+    }
+
+    /* Режим отсчёта - затемняем фон */
+    body.countdown-mode {
+      background: 
+        radial-gradient(circle at 50% 50%, rgba(124, 92, 255, 0.1) 0%, transparent 50%),
+        linear-gradient(180deg, #080c15 0%, #0d121f 50%, #080c15 100%);
     }
 
     /* Анимированный фон с частицами */
@@ -50,6 +58,12 @@
       height: 100%;
       z-index: -1;
       pointer-events: none;
+      opacity: 0.7;
+      transition: opacity 0.5s ease;
+    }
+
+    body.countdown-mode #bg-canvas {
+      opacity: 0.9;
     }
 
     /* Плавающие элементы */
@@ -61,6 +75,12 @@
       height: 100%;
       pointer-events: none;
       z-index: -1;
+      opacity: 0.5;
+      transition: opacity 0.5s ease;
+    }
+
+    body.countdown-mode .floating-elements {
+      opacity: 0.2;
     }
 
     .floating-element {
@@ -115,7 +135,7 @@
     /* Контейнер */
     .wrap{
       width:100%;
-      max-width:1000px;
+      max-width:1200px;
       background: linear-gradient(135deg, 
         rgba(255, 255, 255, 0.03) 0%, 
         rgba(255, 255, 255, 0.01) 100%);
@@ -129,6 +149,17 @@
         0 20px 60px rgba(2, 6, 23, 0.8),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
       z-index: 10;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Режим отсчёта - увеличиваем контейнер */
+    body.countdown-mode .wrap {
+      max-width: 1400px;
+      padding: 50px;
+      background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.02) 0%, 
+        rgba(255, 255, 255, 0.005) 100%);
+      backdrop-filter: blur(30px);
     }
 
     /* Стеклянный эффект */
@@ -159,6 +190,7 @@
       text-align: center;
       margin-bottom: 40px;
       position: relative;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .header h1 {
@@ -170,6 +202,7 @@
       background-clip: text;
       margin-bottom: 10px;
       letter-spacing: -0.5px;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .header p {
@@ -178,6 +211,15 @@
       max-width: 600px;
       margin: 0 auto;
       line-height: 1.6;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* В режиме отсчёта скрываем заголовок */
+    body.countdown-mode .header {
+      opacity: 0;
+      height: 0;
+      margin: 0;
+      overflow: hidden;
     }
 
     /* Карточка с таймером */
@@ -192,20 +234,38 @@
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.05);
       margin-bottom: 30px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 40px rgba(124, 92, 255, 0.2);
+    /* В режиме отсчёта карточка занимает весь контейнер */
+    body.countdown-mode .card {
+      flex-direction: column;
+      gap: 60px;
+      padding: 60px 40px;
+      background: rgba(255, 255, 255, 0.01);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.03);
     }
 
-    .left{flex:1;}
+    .left{flex:1; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);}
+    
+    /* В режиме отсчёта левая часть занимает всё пространство */
+    body.countdown-mode .left {
+      flex: none;
+      width: 100%;
+    }
+    
     .countdown{
       display:flex;
       gap:15px;
       align-items:center;
       justify-content:center;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* В режиме отсчёта увеличиваем размер и отступы */
+    body.countdown-mode .countdown {
+      gap: 30px;
     }
     
     .timebox{
@@ -219,7 +279,19 @@
       border: 1px solid rgba(255, 255, 255, 0.05);
       position:relative;
       overflow:hidden;
-      transition: all 0.3s ease;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      flex: 1;
+    }
+
+    /* В режиме отсчёта увеличиваем размер блоков времени */
+    body.countdown-mode .timebox {
+      min-width: 180px;
+      padding: 40px 30px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.02), 
+        rgba(255, 255, 255, 0.005));
+      border: 1px solid rgba(255, 255, 255, 0.03);
     }
 
     .timebox::before {
@@ -243,6 +315,12 @@
       box-shadow: 0 10px 30px rgba(124, 92, 255, 0.2);
     }
 
+    /* В режиме отсчёта убираем ховер-эффект */
+    body.countdown-mode .timebox:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
     .num{
       font-weight:800;
       font-size:42px;
@@ -251,7 +329,17 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
       letter-spacing: -1px;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
+
+    /* В режиме отсчёта увеличиваем цифры */
+    body.countdown-mode .num {
+      font-size: 72px;
+      background: linear-gradient(135deg, #fff, var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
     .label{
       font-size:13px;
       color:var(--muted);
@@ -259,6 +347,15 @@
       text-transform:uppercase;
       letter-spacing:1px;
       font-weight:600;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* В режиме отсчёта увеличиваем подписи */
+    body.countdown-mode .label {
+      font-size: 16px;
+      margin-top: 15px;
+      color: var(--accent2);
+      font-weight: 700;
     }
 
     /* Управление */
@@ -268,12 +365,24 @@
       gap:20px;
       align-items:stretch;
       min-width:320px;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* В режиме отсчёта скрываем управление */
+    body.countdown-mode .controls {
+      opacity: 0;
+      height: 0;
+      min-width: 0;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
     }
     
     .input-group{
       display:flex;
       flex-direction:column;
       gap:10px;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     .input-group label{
@@ -312,6 +421,20 @@
     .button-group{
       display:flex;
       gap:12px;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Кнопка сброса в режиме отсчёта */
+    .reset-only {
+      display: none;
+      position: absolute;
+      bottom: 30px;
+      right: 30px;
+      z-index: 100;
+    }
+
+    body.countdown-mode .reset-only {
+      display: flex;
     }
     
     .btn{
@@ -377,6 +500,7 @@
       height: 100%;
       pointer-events: none;
       z-index: 1;
+      opacity: 0.5;
     }
 
     .sparkle {
@@ -450,6 +574,17 @@
       background: rgba(255, 255, 255, 0.02);
       border-radius: 12px;
       backdrop-filter: blur(10px);
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* В режиме отсчёта скрываем футер */
+    body.countdown-mode footer {
+      opacity: 0;
+      height: 0;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+      border: none;
     }
 
     footer::before {
@@ -467,7 +602,7 @@
       z-index: 15;
     }
 
-    /* ОВЕРЛЕЙ С ПОЗДРАВЛЕНИЕМ - ТЕМНЫЙ ВАРИАНТ */
+    /* ОВЕРЛЕЙ С ПОЗДРАВЛЕНИЕМ */
     .overlay{
       position: fixed;
       top:0;
@@ -591,6 +726,28 @@
       box-shadow: 0 10px 30px rgba(124, 92, 255, 0.4);
     }
 
+    /* Индикатор обратного отсчёта */
+    .countdown-indicator {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--accent2);
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    body.countdown-mode .countdown-indicator {
+      opacity: 1;
+    }
+
     /* Адаптивность */
     @media (max-width: 968px) {
       .card{
@@ -609,6 +766,16 @@
       
       .num{
         font-size:36px;
+      }
+      
+      /* В режиме отсчёта на планшетах */
+      body.countdown-mode .num {
+        font-size: 56px;
+      }
+      
+      body.countdown-mode .timebox {
+        min-width: 140px;
+        padding: 30px 20px;
       }
       
       .wrap{
@@ -630,6 +797,31 @@
       
       .birthday-subtitle {
         font-size: 20px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body.countdown-mode .countdown {
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+      
+      body.countdown-mode .timebox {
+        flex: 0 0 calc(50% - 10px);
+        min-width: 120px;
+      }
+      
+      body.countdown-mode .num {
+        font-size: 48px;
+      }
+      
+      body.countdown-mode .label {
+        font-size: 14px;
+      }
+      
+      .reset-only {
+        bottom: 20px;
+        right: 20px;
       }
     }
 
@@ -676,6 +868,21 @@
         font-size: 36px;
         gap: 20px;
       }
+      
+      /* В режиме отсчёта на мобильных */
+      body.countdown-mode .timebox {
+        flex: 0 0 calc(50% - 10px);
+        min-width: 100px;
+        padding: 25px 15px;
+      }
+      
+      body.countdown-mode .num {
+        font-size: 36px;
+      }
+      
+      body.countdown-mode .label {
+        font-size: 12px;
+      }
     }
 
     @media (max-width: 480px) {
@@ -712,6 +919,25 @@
       .birthday-subtitle {
         font-size: 16px;
       }
+      
+      /* В режиме отсчёта на маленьких мобильных */
+      body.countdown-mode .timebox {
+        padding: 20px 10px;
+        min-width: 80px;
+      }
+      
+      body.countdown-mode .num {
+        font-size: 28px;
+      }
+      
+      body.countdown-mode .label {
+        font-size: 10px;
+      }
+      
+      .reset-only {
+        padding: 12px 20px;
+        font-size: 14px;
+      }
     }
   </style>
 </head>
@@ -726,7 +952,7 @@
     <div class="floating-element"></div>
   </div>
 
-  <!-- ОВЕРЛЕЙ С ПОЗДРАВЛЕНИЕМ - ТЕМНЫЙ ВАРИАНТ -->
+  <!-- ОВЕРЛЕЙ С ПОЗДРАВЛЕНИЕМ -->
   <div id="overlay" class="overlay">
     <div class="overlay-content">
       <h1 class="birthday-title">🎉 С Днём Рождения! 🎂</h1>
@@ -746,12 +972,17 @@
 
   <!-- Основной контейнер -->
   <div class="wrap">
+    <!-- Индикатор отсчёта -->
+    <div class="countdown-indicator">
+      ⏳ Обратный отсчёт запущен
+    </div>
+    
     <!-- Огоньки -->
     <div class="sparkles" id="sparkles"></div>
     
     <!-- Заголовок -->
     <div class="header">
-      <h1>Отсчёт до дня рождения</h1>
+      <h1>🎂 Отсчёт до дня рождения</h1>
       <p>Установите дату и следите за обратным отсчётом до самого важного дня в году!</p>
     </div>
 
@@ -774,13 +1005,23 @@
         </div>
         <div class="button-group">
           <button id="startBtn" class="btn">
+            <span class="btn-icon">▶️</span>
             <span>Запустить отсчёт</span>
           </button>
           <button id="resetBtn" class="btn reset">
+            <span class="btn-icon">🔄</span>
             <span>Сброс</span>
           </button>
         </div>
       </div>
+    </div>
+
+    <!-- Кнопка сброса только в режиме отсчёта -->
+    <div class="reset-only">
+      <button id="resetCountdownBtn" class="btn reset">
+        <span class="btn-icon">🔄</span>
+        <span>Сбросить отсчёт</span>
+      </button>
     </div>
 
     <!-- Анимация празднования -->
@@ -802,13 +1043,15 @@
 <script>
 const $ = s => document.querySelector(s);
 const $days = $('#days'), $hours = $('#hours'), $minutes = $('#minutes'), $seconds = $('#seconds');
-const $start = $('#startBtn'), $reset = $('#resetBtn'), $input = $('#targetInput');
+const $start = $('#startBtn'), $reset = $('#resetBtn'), $resetCountdownBtn = $('#resetCountdownBtn'), $input = $('#targetInput');
 const $message = $('#message'), $popper = $('#popper'), $celebrate = $('#celebrate');
 const $overlay = $('#overlay'), $sparkles = $('#sparkles'), $closeOverlay = $('#closeOverlay');
+const $body = $('body');
 
 let timerId = null;
 let celebrating = false;
 let currentTarget = null;
+let countdownMode = false;
 
 // ==================== АНИМИРОВАННЫЙ ФОН ====================
 const bgCanvas = $('#bg-canvas');
@@ -954,6 +1197,53 @@ function stopTimer(){
   } 
 }
 
+// ==================== ПЕРЕКЛЮЧЕНИЕ РЕЖИМОВ ====================
+
+// Включить режим отсчёта
+function enableCountdownMode() {
+  countdownMode = true;
+  $body.classList.add('countdown-mode');
+  
+  // Сохраняем дату в localStorage
+  if (currentTarget) {
+    localStorage.setItem('birthdayCountdownDate', currentTarget.getTime());
+    localStorage.setItem('birthdayCountdownMode', 'true');
+  }
+}
+
+// Отключить режим отсчёта
+function disableCountdownMode() {
+  countdownMode = false;
+  $body.classList.remove('countdown-mode');
+  localStorage.removeItem('birthdayCountdownDate');
+  localStorage.removeItem('birthdayCountdownMode');
+}
+
+// Проверить сохранённый отсчёт
+function checkSavedCountdown() {
+  const savedDate = localStorage.getItem('birthdayCountdownDate');
+  const savedMode = localStorage.getItem('birthdayCountdownMode');
+  
+  if (savedDate && savedMode === 'true') {
+    const targetDate = new Date(parseInt(savedDate));
+    const now = new Date();
+    
+    // Если дата ещё не наступила, восстанавливаем отсчёт
+    if (targetDate > now) {
+      currentTarget = targetDate;
+      prefill(targetDate);
+      startTimer(targetDate);
+      enableCountdownMode();
+      return true;
+    } else {
+      // Если дата прошла, очищаем сохранения
+      localStorage.removeItem('birthdayCountdownDate');
+      localStorage.removeItem('birthdayCountdownMode');
+    }
+  }
+  return false;
+}
+
 // ==================== КОНФЕТТИ ====================
 const canvas = $('#confettiCanvas');
 const ctx = canvas.getContext('2d');
@@ -1077,6 +1367,9 @@ function triggerCelebration(){
   celebrating = true;
   stopTimer();
   
+  // Выходим из режима отсчёта
+  disableCountdownMode();
+  
   // Показать сообщение
   $message.style.display='block';
   
@@ -1104,6 +1397,7 @@ function closeCelebration() {
     nextYear.setFullYear(nextYear.getFullYear() + 1);
     prefill(nextYear);
     startTimer(nextYear);
+    enableCountdownMode();
   } else {
     const d = defaultTarget();
     prefill(d);
@@ -1117,12 +1411,17 @@ function init() {
   initBackground();
   animateBackground();
   
-  // Установить дату по умолчанию
-  const initialDate = defaultTarget();
-  prefill(initialDate);
+  // Проверяем сохранённый отсчёт
+  const hasSavedCountdown = checkSavedCountdown();
   
-  // Начать отсчет
-  startTimer(initialDate);
+  if (!hasSavedCountdown) {
+    // Установить дату по умолчанию
+    const initialDate = defaultTarget();
+    prefill(initialDate);
+    
+    // Начать отсчет
+    startTimer(initialDate);
+  }
   
   // Убедиться, что оверлей скрыт при запуске
   $overlay.classList.remove("show");
@@ -1148,12 +1447,34 @@ $start.onclick = ()=>{
   $message.style.display = 'none';
   $overlay.classList.remove("show");
   startTimer(t);
+  
+  // Включаем режим отсчёта
+  enableCountdownMode();
 };
 
+// Обработчик для сброса в обычном режиме
 $reset.onclick = ()=>{
   celebrating = false;
   $message.style.display = 'none';
   $overlay.classList.remove("show");
+  
+  // Выходим из режима отсчёта
+  disableCountdownMode();
+  
+  const d = defaultTarget();
+  prefill(d);
+  startTimer(d);
+};
+
+// Обработчик для сброса в режиме отсчёта
+$resetCountdownBtn.onclick = ()=>{
+  celebrating = false;
+  $message.style.display = 'none';
+  $overlay.classList.remove("show");
+  
+  // Выходим из режима отсчёта
+  disableCountdownMode();
+  
   const d = defaultTarget();
   prefill(d);
   startTimer(d);
